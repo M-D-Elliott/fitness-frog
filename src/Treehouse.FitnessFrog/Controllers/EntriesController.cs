@@ -68,24 +68,6 @@ namespace Treehouse.FitnessFrog.Controllers
             return View(entry);
         }
 
-        [HttpPost]
-        public ActionResult Edit(Entry entry)
-        {
-            ValidateEntry(entry);
-
-            if (ModelState.IsValid)
-            {
-                _entriesRepository.UpdateEntry(entry);
-
-                return RedirectToAction("Index");
-            }
-
-            SetupActivitiesSelectListItems();
-            
-            return View(entry);
-        }
-
-
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -105,6 +87,23 @@ namespace Treehouse.FitnessFrog.Controllers
             return View(entry);
         }
 
+        [HttpPost]
+        public ActionResult Edit(Entry entry)
+        {
+            ValidateEntry(entry);
+
+            if (ModelState.IsValid)
+            {
+                _entriesRepository.UpdateEntry(entry);
+
+                return RedirectToAction("Index");
+            }
+
+            SetupActivitiesSelectListItems();
+
+            return View(entry);
+        }
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -112,7 +111,22 @@ namespace Treehouse.FitnessFrog.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            return View();
+            Entry entry = _entriesRepository.GetEntry((int)id);
+
+            if (entry == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(entry);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            _entriesRepository.DeleteEntry(id);
+
+            return RedirectToAction("Index");
         }
 
         private void ValidateEntry(Entry entry)
